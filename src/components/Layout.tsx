@@ -138,7 +138,7 @@ const VIEW_LINKS: MenuLink[] = [
 
 const CALCULATE_LINKS: MenuLink[] = [
   { to: '/breeding', label: 'Breeding Pairs' },
-  { to: '/planner',  label: 'Mutation Planner' },
+  { to: '/habitat',  label: 'Habitat Planner' },
   { to: '/tree',     label: 'Pair Tree' },
   { to: '/nomu',     label: 'NoMu Wheels' },
 ];
@@ -298,7 +298,7 @@ function SettingsDropdown() {
           </button>
 
           {/* Row 6: Frog entry — label (left), dropdowns (center), text box (right) */}
-          <span className="settings-row-label" title="How frogs are entered on Breeding Pairs, Mutation Planner, Frog and Mutation Submissions">Input:</span>
+          <span className="settings-row-label" title="How frogs are entered on Breeding Pairs, Habitat Planner, Frog and Mutation Submissions">Input:</span>
           <button className={`settings-theme-opt${entry === 'combo' ? ' active' : ''}`} onClick={() => setEntry('combo')} aria-label="Enter frogs with dropdowns" title="Base / Secondary / Breed dropdowns">
             <IconDropdowns />
           </button>

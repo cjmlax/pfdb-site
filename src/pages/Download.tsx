@@ -127,7 +127,7 @@ export default function Download() {
       <p className="search-hint" style={{ marginTop: 0 }}>
         Data is available for export as it's stored in the database. The files are a direct API call to the database for that table. This means you will need an internet connnection to start and complete the download.
       </p>
-      <p className="search-hint"> If you're looking to validate a previous download, use the hash or 'fingerprint' value. This value changes as the data does, so a different value means updated data.</p>
+      <p className="search-hint"> If you're looking to validate a previous download, compare your copy with the latest hash time and hash fingerprint value. Data is hashed on a schedule and when a user downloads it, or all hashes can be refreshed with the button above. Hashes are in no way unique betwen users or devices.</p>
 
       {loadError ? (
         <p className="search-error">Could not load export options. Please try again later.</p>

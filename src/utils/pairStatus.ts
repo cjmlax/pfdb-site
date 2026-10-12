@@ -1,6 +1,6 @@
 import type { FrogPair } from '../api/teable';
 
-// Pair status shared by the Mutation Planner and Pair Tree.
+// Pair status shared by the Habitat Planner and Pair Tree.
 // Grey: no pair record, or one that isn't Verified (its data implies nothing).
 // Green: Verified with no mutations. Yellow: Verified and produces a mutation.
 export type LineStatus = 'unknown' | 'clear' | 'mutation';

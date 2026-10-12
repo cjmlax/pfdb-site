@@ -23,7 +23,7 @@ const CHECK_BATCH = 64;
 // Pairs sent at once while verifying.
 const SEND_LIMIT = 3;
 
-// "Are you sure?" for Verify mode (Mutation Planner, Pair Tree). Opens by checking
+// "Are you sure?" for Verify mode (Habitat Planner, Pair Tree). Opens by checking
 // every picked pair with the worker, flagging any that can't be recorded
 // (already verified, leftover data, a combo pending review…). Accept then sends
 // the rest one by one: each shows a check as it lands, then clears. Decline

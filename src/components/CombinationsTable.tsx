@@ -77,17 +77,19 @@ function IconLinkOut() {
   );
 }
 
-// `highlight` picks out one word of the name (the mutation type in a result
-// frog, e.g. Aqua *Chroma* Crustalli), styled like Weekly Sets' breed matches.
+// Picks out one word of a name (the mutation type in a result frog, e.g.
+// Aqua *Chroma* Crustalli), styled like Weekly Sets' breed matches.
+export function HighlightWord({ name, word }: { name: string; word: string }) {
+  return name.split(' ').map((w, i) => (
+    <span key={i}>
+      {i > 0 && ' '}
+      {w === word ? <span className="weekly-frog-match">{w}</span> : w}
+    </span>
+  ));
+}
+
 function FrogLink({ title, name, highlight }: { title: string | null; name: string; highlight?: string }) {
-  const text = highlight
-    ? name.split(' ').map((word, i) => (
-        <span key={i}>
-          {i > 0 && ' '}
-          {word === highlight ? <span className="weekly-frog-match">{word}</span> : word}
-        </span>
-      ))
-    : name;
+  const text = highlight ? <HighlightWord name={name} word={highlight} /> : name;
   return title ? <a href={frogPath(title)} className="plain-link">{text}</a> : <>{text}</>;
 }
 

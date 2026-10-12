@@ -201,7 +201,7 @@ function useBoardSize(el: HTMLDivElement | null): BoardSize {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function MutationPlanner() {
+export default function HabitatPlanner() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const frogOptions = useFrogOptions();
@@ -388,7 +388,7 @@ export default function MutationPlanner() {
 
   return (
     <div>
-      <h1>Mutation Planner</h1>
+      <h1>Habitat Planner</h1>
       <p className="search-hint" style={{ marginTop: 0 }}>
         {verifyMode ? (
           <>

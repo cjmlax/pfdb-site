@@ -707,7 +707,7 @@ a.plain-link:hover {
   overflow-wrap: anywhere;
 }
 
-/* ─── Mutation Planner page ────────────────────────────────────────────────── */
+/* ─── Habitat Planner page ────────────────────────────────────────────────── */
 
 .planner-editor {
   margin-top: 20px;
@@ -3084,8 +3084,13 @@ a.csv-btn {
   font-size: 14px;
 }
 
-.submission-history-summary { flex: 1; min-width: 0; }
-.submission-history-date { opacity: 0.55; font-size: 12px; white-space: nowrap; }
+/* A pair's mutations stack beside its parents, one result per line. */
+.submission-history-parents { flex-shrink: 0; }
+.submission-history-results { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+@media (max-width: 600px) {
+  .submission-history-row { flex-direction: column; gap: 2px; }
+}
 
 .submission-pending-hint {
   margin-top: 8px;

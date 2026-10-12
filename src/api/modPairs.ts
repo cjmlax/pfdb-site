@@ -1,4 +1,4 @@
-// Mod client for recording no-mutation pairs (Mutation Planner → Verify). The
+// Mod client for recording no-mutation pairs (Habitat Planner → Verify). The
 // worker's requireUserMod gate checks the mod group; pairs are sent as Frog_IDs.
 import { API_BASE } from './base';
 

@@ -15,7 +15,7 @@ import {
 import { STATUS_TEXT, pairKey, pairStatusById, type LineStatus } from '../utils/pairStatus';
 
 // One frog at the top, paired with each frog in a list below it, every pair's
-// status on its branch off the trunk. Like the Mutation Planner, anyone can
+// status on its branch off the trunk. Like the Habitat Planner, anyone can
 // build a tree to look at; mods can switch to Verify mode and record unverified
 // pairs as producing no mutations. Built for long lists, where the planner's
 // 8-frog board runs out.
@@ -133,7 +133,7 @@ export default function PairTree() {
   const status = (f: TreeFrog): LineStatus => pairStatusById(pairByKey, root?.id ?? null, f.id);
 
   // ── Verify mode ───────────────────────────────────────────────────────────
-  // Tied to the tree it was started on, as on the Mutation Planner: any change
+  // Tied to the tree it was started on, as on the Habitat Planner: any change
   // to the URL leaves it. The tree can't be edited while verifying.
   const [verifyPlan, setVerifyPlan] = useState<string | null>(null);
   const [picked, setPicked] = useState<Set<string>>(new Set());

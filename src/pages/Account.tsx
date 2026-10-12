@@ -3,11 +3,12 @@ import { useAuth } from 'react-oidc-context';
 import { useSearchParams } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  fetchMe, submitFriendCode, cancelFriendCode, confirmFriendCode, fetchMySubmissions, saveShowCredit, startLink,
+  fetchMe, submitFriendCode, cancelFriendCode, confirmFriendCode, fetchMySubmissions, fetchMyMutations, saveShowCredit, startLink,
 } from '../api/profile';
 import { useDisplayName, platformIcon, SIGN_IN_ONLY_SOURCES, type DisplayNameOption } from '../hooks/useDisplayName';
 import { badgeChipStyle } from '../utils/badgeStyle';
 import { linkProviders } from '../auth/authConfig';
+import { HighlightWord } from '../components/CombinationsTable';
 
 // What the worker reports (?link=…) when a provider link attempt returns here.
 function linkOutcomeMessage(outcome: string, label: string): { text: string; error: boolean } | null {
@@ -114,6 +115,12 @@ export default function Account() {
   const { data: submissions } = useQuery({
     queryKey: ['my-submissions'],
     queryFn: () => fetchMySubmissions(idToken!),
+    enabled: auth.isAuthenticated && !!idToken,
+  });
+
+  const { data: mutations } = useQuery({
+    queryKey: ['my-mutations'],
+    queryFn: () => fetchMyMutations(idToken!),
     enabled: auth.isAuthenticated && !!idToken,
   });
 
@@ -343,22 +350,26 @@ export default function Account() {
       )}
 
       {(() => {
-        const approved = submissions?.filter(s => s.status === 'pushed');
         const pendingCount = submissions?.filter(s => s.status === 'pending').length ?? 0;
         return (
           <>
             <h2 style={{ marginTop: 24 }}>Your Approved Combinations</h2>
-            {!submissions ? (
+            {!mutations ? (
               <p className="search-hint">Loading…</p>
-            ) : !approved || approved.length === 0 ? (
+            ) : mutations.length === 0 ? (
               <p className="search-hint">No approved combinations yet.</p>
             ) : (
               <div className="submission-history">
-                {approved.map(s => (
-                  <div key={s.id} className="submission-history-row">
-                    <span className="submission-history-summary">{s.summary}</span>
-                    <span className="submission-history-date">
-                      {new Date(s.reviewedAt ?? s.createdAt).toLocaleDateString()}
+                {mutations.map(pair => (
+                  <div key={pair.id} className="submission-history-row">
+                    <span className="submission-history-parents">{pair.frogA} + {pair.frogB}</span>
+                    <span className="submission-history-results">
+                      {pair.mutations.map(m => (
+                        <span key={m.id}>
+                          → <HighlightWord name={m.result} word={m.type} />
+                          {m.lost && ` (replaces ${m.lost})`}
+                        </span>
+                      ))}
                     </span>
                   </div>
                 ))}

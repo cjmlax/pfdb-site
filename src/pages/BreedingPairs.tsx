@@ -106,7 +106,7 @@ export default function BreedingPairs() {
   const { spoilers } = useSpoilers();
 
   // ?pair= holds both parents' Frog_IDs (e.g. "18:11:0_18:4:0", as linked from
-  // the Mutation Planner). Read once the lookup tables load; the inputs are keyed
+  // the Habitat Planner). Read once the lookup tables load; the inputs are keyed
   // on this so they remount showing the restored parents.
   const [urlRead, setUrlRead] = useState(false);
   if (lookup && !urlRead) {

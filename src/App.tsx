@@ -6,7 +6,7 @@ import Frog from './pages/Frog';
 import WeeklyList from './pages/WeeklyList';
 import Breed from './pages/Breed';
 import BreedingPairs from './pages/BreedingPairs';
-import MutationPlanner from './pages/MutationPlanner';
+import HabitatPlanner from './pages/HabitatPlanner';
 import PairTree from './pages/PairTree';
 import NoMuWheels from './pages/NoMuWheels';
 import SubmitCombo from './pages/SubmitCombo';
@@ -39,7 +39,7 @@ const router = createBrowserRouter([
       { path: 'weekly', element: <WeeklyList /> },
       { path: 'breed', element: <Breed /> },
       { path: 'breeding', element: <BreedingPairs /> },
-      { path: 'planner', element: <MutationPlanner /> },
+      { path: 'habitat', element: <HabitatPlanner /> },
       { path: 'tree', element: <PairTree /> },
       { path: 'nomu', element: <NoMuWheels /> },
       { path: 'submit', element: <SubmitCombo /> },
@@ -49,6 +49,7 @@ const router = createBrowserRouter([
       { path: 'frogs', element: <Moved to="/search" /> },
       { path: 'breeds', element: <Moved to="/breed" /> },
       { path: 'downloads', element: <Moved to="/download" /> },
+      { path: 'planner', element: <Moved to="/habitat" /> },
       { path: 'account', element: <Account /> },
       { path: 'admin', element: <AdminHome /> },
       { path: 'admin/badges', element: <AdminBadges /> },

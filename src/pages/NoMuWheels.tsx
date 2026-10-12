@@ -15,7 +15,7 @@ import { createWheelSolver, pairFloors, type PlanRow, type WheelMode, type Wheel
 import { WHEEL_PRESETS } from '../utils/wheelPresets';
 
 // Wheels are laid out over three habitats of up to 8 frogs (a habitat's cap,
-// and the Mutation Planner's), so each habitat can be opened in the Planner.
+// and the Habitat Planner's), so each habitat can be opened in the Planner.
 const HABITATS = 3;
 
 const MODE_TEXT: Record<WheelMode, { label: string; hint: string }> = {
@@ -507,7 +507,7 @@ export default function NoMuWheels() {
                   <h3>Habitat {h + 1}</h3>
                   <span className="planner-count">{frogs.length} / {HABITAT_SIZE}</span>
                   {frogs.length > 0 && (
-                    <Link className="csv-btn" to={`/planner${frogSearch('frogs', frogIdsParam(frogs))}`}>
+                    <Link className="csv-btn" to={`/habitat${frogSearch('frogs', frogIdsParam(frogs))}`}>
                       Open in Planner
                     </Link>
                   )}
@@ -711,7 +711,7 @@ export default function NoMuWheels() {
                               {!g.verified && (
                                 <>
                                   {' · '}
-                                  <Link to={`/planner${frogSearch('frogs', frogIdsParam([g.a, g.b]))}`}>Open in Planner</Link>
+                                  <Link to={`/habitat${frogSearch('frogs', frogIdsParam([g.a, g.b]))}`}>Open in Planner</Link>
                                 </>
                               )}
                             </td>

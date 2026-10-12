@@ -84,6 +84,23 @@ export async function fetchMySubmissions(idToken: string): Promise<MySubmission[
   return res.json();
 }
 
+// A Frog Pairs record credited to the signed-in user, with its mutations.
+export interface MyMutationPair {
+  id: string;
+  frogA: string;
+  frogB: string;
+  mutations: { id: string; type: string; result: string; lost: string | null }[];
+}
+
+// Mutations on Frog Pairs credited to the signed-in user, read live from Teable.
+export async function fetchMyMutations(idToken: string): Promise<MyMutationPair[]> {
+  const res = await fetch(`${API_BASE}/api/me/mutations`, {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!res.ok) throw new Error(`Mutations fetch failed (${res.status})`);
+  return res.json();
+}
+
 // Submits a friend code, opening a 'pending' request for admin review.
 export async function submitFriendCode(idToken: string, code: string): Promise<Profile> {
   const res = await fetch(`${API_BASE}/api/me/flair`, {

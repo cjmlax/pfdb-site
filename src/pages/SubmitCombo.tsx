@@ -258,12 +258,12 @@ export default function SubmitCombo() {
 
   return (
     <div>
-      <h1>Glass/Chroma Submissions</h1>
+      <h1>Mutation Submissions</h1>
       <p className="search-hint" style={{ marginTop: 0 }}>
         If you've discovered a Glass or Chroma breeding mutation, submit that combination here.
-        The page will check against the database once both parents are entered.
-        If there isn't an existing match, you can complete the rest of the form to submit.
+        The page will check against the database once both parents are entered to ensure duplicates aren't recorded.
         All submissions are reviewed manually before being pushed into the database.
+        You will need to have an uncropped screenshot of the mutation in order to submit, as well as know which frog was replaced by the mutation.
         If you would like credit for your submisisons, make sure you're logged in under the site settings.
       </p>
 
@@ -366,10 +366,10 @@ export default function SubmitCombo() {
                 />
                 {screenshotUrl
                   ? <img src={screenshotUrl} alt="Selected screenshot" />
-                  : <span>Click or drop a screenshot here</span>}
+                  : <span>Click to upload or drop a screenshot here</span>}
               </label>
               <p className="search-hint" style={{ margin: 0 }}>
-                Please use original, uncropped images - the submission engine will adjust images automatically. Preferably tap the mutation to show its name.
+                Please use original, uncropped images - the submission engine will adjust images automatically. Preferably, tap the mutation to show its name.
               </p>
               {fileError && <p className="search-error" style={{ margin: 0 }}>{fileError}</p>}
             </div>
@@ -403,14 +403,14 @@ export default function SubmitCombo() {
                 ))}
               </select>
               <p className="search-hint" style={{ marginTop: 4 }}>
-                The version the mutation was found on, if it wasn't the current one.
+                The version the mutation was found on, defaults to latest.
               </p>
             </div>
           </div>
 
           {/* Only an invalid link is flagged live; anything else waits for a submit attempt. */}
           {!sourceValid ? (
-            <p className="search-error">Attribution link is not a valid URL</p>
+            <p className="search-error">Attribution link must be a valid URL</p>
           ) : attempted && !resultReady ? (
             <p className="search-error">{missingMessage}</p>
           ) : null}

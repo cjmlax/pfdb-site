@@ -65,7 +65,7 @@ function IconPin() {
   );
 }
 
-// Three frogs, all linked to each other — the Mutation Planner.
+// Three frogs, all linked to each other — the Habitat Planner.
 function IconPlanner() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -338,10 +338,10 @@ export default function Search() {
             <div className="pinned-title">
               <h2 style={{ margin: 0 }}>Comparison</h2>
               <ComparisonLink
-                to={`/planner?frogs=${frogIdsParam(pinned.map(r => r.fields.Frog_ID))}`}
+                to={`/habitat?frogs=${frogIdsParam(pinned.map(r => r.fields.Frog_ID))}`}
                 enabled={pinned.length <= MAX_PLANNER_FROGS}
-                label="Open these frogs in the Mutation Planner"
-                disabledLabel={`The Mutation Planner holds up to ${MAX_PLANNER_FROGS} frogs`}
+                label="Open these frogs in the Habitat Planner"
+                disabledLabel={`The Habitat Planner holds up to ${MAX_PLANNER_FROGS} frogs`}
               >
                 <IconPlanner />
               </ComparisonLink>

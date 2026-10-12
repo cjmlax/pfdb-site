@@ -12,7 +12,7 @@ export type CompleteFrogSel = { [K in keyof FrogSel]: ComboOption };
 
 export const EMPTY_FROG: FrogSel = { base: null, sec: null, breed: null };
 
-// The Mutation Planner's cap, matching the 8 frogs a habitat holds in-game.
+// The Habitat Planner's cap, matching the 8 frogs a habitat holds in-game.
 export const MAX_PLANNER_FROGS = 8;
 
 export function isComplete(s: FrogSel): s is CompleteFrogSel {
