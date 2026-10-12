@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from 'react-oidc-context';
+import { hasRole, ADMIN_ROLE } from '../auth/roles';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   adminListAlerts, adminCreateAlert, adminUpdateAlert, adminDeleteAlert,
   type AlertLevel, type AdminAlert,
 } from '../api/alerts';
 
-// pfdb_groups arrives with the "pfdb-" prefix stripped, so "pfdb-admins" → "admins".
-const ADMIN_GROUP = 'admins';
 const LEVELS: { value: AlertLevel; label: string }[] = [
   { value: 'info', label: 'Info' },
   { value: 'warning', label: 'Warning' },
@@ -18,8 +17,7 @@ export default function AdminAlerts() {
   const auth = useAuth();
   const idToken = auth.user?.id_token;
   const queryClient = useQueryClient();
-  const groups = (auth.user?.profile?.pfdb_groups as string[] | undefined) ?? [];
-  const isAdmin = groups.includes(ADMIN_GROUP);
+  const isAdmin = hasRole(auth.user, ADMIN_ROLE);
   const enabled = auth.isAuthenticated && isAdmin && !!idToken;
 
   const alertsQuery = useQuery({ queryKey: ['admin-alerts'], queryFn: () => adminListAlerts(idToken!), enabled });

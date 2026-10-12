@@ -1,16 +1,13 @@
 import { useAuth } from 'react-oidc-context';
+import { hasRole, ADMIN_ROLE } from '../auth/roles';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import { listPending, listFlairRequests } from '../api/adminSubmissions';
 
-// pfdb_groups arrives with the "pfdb-" prefix stripped, so "pfdb-admins" → "admins".
-const ADMIN_GROUP = 'admins';
-
 export default function AdminHome() {
   const auth = useAuth();
   const idToken = auth.user?.id_token;
-  const groups = (auth.user?.profile?.pfdb_groups as string[] | undefined) ?? [];
-  const isAdmin = groups.includes(ADMIN_GROUP);
+  const isAdmin = hasRole(auth.user, ADMIN_ROLE);
   const enabled = auth.isAuthenticated && isAdmin && !!idToken;
 
   // Both queries share their cache keys with the review page, so they're free there.

@@ -1,10 +1,25 @@
 import { useState } from 'react';
 import { useAuth } from 'react-oidc-context';
+import { useSearchParams } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchMe, submitFriendCode, cancelFriendCode, confirmFriendCode, fetchMySubmissions, saveShowCredit } from '../api/profile';
+import {
+  fetchMe, submitFriendCode, cancelFriendCode, confirmFriendCode, fetchMySubmissions, saveShowCredit, startLink,
+} from '../api/profile';
 import { useDisplayName, platformIcon, SIGN_IN_ONLY_SOURCES, type DisplayNameOption } from '../hooks/useDisplayName';
 import { badgeChipStyle } from '../utils/badgeStyle';
-import { sourceLoginOptions } from '../auth/authConfig';
+import { linkProviders } from '../auth/authConfig';
+
+// What the worker reports (?link=…) when a provider link attempt returns here.
+function linkOutcomeMessage(outcome: string, label: string): { text: string; error: boolean } | null {
+  switch (outcome) {
+    case 'linked':    return { text: `${label} is now linked to your account.`, error: false };
+    case 'taken':     return { text: `That ${label} account already has its own PFDB account, so it can't be linked here.`, error: true };
+    case 'cancelled': return { text: `${label} sign-in was cancelled.`, error: true };
+    case 'expired':   return { text: 'That link attempt expired or was started in another browser. Please try again.', error: true };
+    case 'error':     return { text: `Couldn't link ${label}. Please try again.`, error: true };
+    default:          return null;
+  }
+}
 
 // Fallback avatar shown for options with no platform favicon (currently just Friend Code).
 function IconAvatar() {
@@ -39,7 +54,7 @@ export default function Account() {
   const idToken = auth.user?.id_token;
   const { source, setSource, options, connectedKeys } = useDisplayName();
 
-  // The worker-owned profile (badges + flair), keyed on the Authentik subject.
+  // The worker-owned profile (badges + flair), keyed on the Zitadel user id.
   const { data: profile, isLoading: profileLoading, isError: profileError } = useQuery({
     queryKey: ['me'],
     queryFn: () => fetchMe(idToken!),
@@ -77,6 +92,20 @@ export default function Account() {
     onError: e => setConfirmError((e as Error).message),
   });
 
+  // Result of a provider link attempt, reported by the worker on the way back.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const linkOutcome = linkOutcomeMessage(
+    searchParams.get('link') ?? '',
+    linkProviders.find(p => p.key === searchParams.get('provider'))?.label ?? 'That account',
+  );
+  const dismissLinkOutcome = () => setSearchParams({}, { replace: true });
+
+  // Sends the browser to the provider; the worker links it on the way back.
+  const link = useMutation({
+    mutationFn: (provider: string) => startLink(idToken!, provider),
+    onSuccess: authUrl => window.location.assign(authUrl),
+  });
+
   const showCredit = useMutation({
     mutationFn: (show: boolean) => saveShowCredit(idToken!, show),
     onSuccess: updated => queryClient.setQueryData(['me'], updated),
@@ -111,6 +140,13 @@ export default function Account() {
           ? 'Choose which account name is shown throughout the site.'
           : 'Link another account to set the name shown throughout the site.'}
       </p>
+      {linkOutcome && (
+        <p className={linkOutcome.error ? 'search-error' : 'search-hint'} style={{ marginTop: 0 }}>
+          {linkOutcome.text}{' '}
+          <button className="csv-btn" onClick={dismissLinkOutcome}>Dismiss</button>
+        </p>
+      )}
+      {link.isError && <p className="search-error" style={{ marginTop: 0 }}>{(link.error as Error).message}</p>}
       <div className="display-name-picker">
         {/* Friend Code — always visible; blank and non-interactive until one is
             approved via the request flow further down the page. */}
@@ -130,9 +166,9 @@ export default function Account() {
           </div>
         )}
 
-        {/* Known login sources — always visible; connected ones are selectable,
-            unconnected ones deep-link straight to that provider's OIDC login. */}
-        {sourceLoginOptions.map(s => {
+        {/* Known sign-in providers — always visible; linked ones are selectable,
+            unlinked ones start linking that provider to this account. */}
+        {linkProviders.map(s => {
           const opt = options.find(o => o.key === s.key);
           if (opt) return <ConnectedTile key={s.key} opt={opt} active={source === opt.key} onSelect={() => setSource(opt.key)} />;
           const icon = platformIcon(s.key);
@@ -150,17 +186,24 @@ export default function Account() {
             );
           }
           return (
-            <a key={s.key} className="display-name-add" href={s.loginUrl} aria-label={`Connect ${s.label}`} title={`Connect ${s.label}`}>
+            <button
+              key={s.key}
+              className="display-name-add"
+              disabled={link.isPending}
+              onClick={() => link.mutate(s.key)}
+              aria-label={`Connect ${s.label}`}
+              title={`Connect ${s.label}`}
+            >
               {icon && <img src={icon} width={16} height={16} style={{ borderRadius: 3 }} alt="" />}
               <span className="display-name-add-label">{s.label}</span>
-            </a>
+            </button>
           );
         })}
 
-        {/* Any other connected source Authentik reports that isn't one of the
-            fixed tiles above (no dedicated login URL for these yet). */}
+        {/* Any other linked platform the worker reports that isn't one of the
+            fixed tiles above. */}
         {options
-          .filter(o => o.key !== 'pfdb' && !sourceLoginOptions.some(s => s.key === o.key))
+          .filter(o => o.key !== 'pfdb' && !linkProviders.some(s => s.key === o.key))
           .map(opt => (
             <ConnectedTile key={opt.key} opt={opt} active={source === opt.key} onSelect={() => setSource(opt.key)} />
           ))}

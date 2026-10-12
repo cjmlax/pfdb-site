@@ -1,6 +1,6 @@
 // Client for the worker's per-user profile endpoints. The signed-in user's OIDC
 // id_token is sent as a Bearer token; the worker verifies it and keys everything
-// on the Authentik subject.
+// on the Zitadel user id.
 import { API_BASE } from './base';
 
 export interface Badge {
@@ -24,6 +24,7 @@ export interface Profile {
   flair_sender_code: string | null; // sender's Friend Code, set once status is 'sent'
   display_source: string | null; // chosen display-name source: 'pfdb' or a platform key
   show_credit: boolean;          // named in public mutation credits
+  connected_accounts: Record<string, string>; // linked platform key → the user's name on it
   badges: Badge[];
 }
 
@@ -125,4 +126,20 @@ export async function confirmFriendCode(
     throw new Error(detail);
   }
   return res.json();
+}
+
+// Starts linking another sign-in provider (e.g. 'discord') to this account.
+// Returns the provider URL to send the browser to; the worker finishes the link
+// on the way back and lands on /account?link=<outcome>&provider=<key>.
+export async function startLink(idToken: string, provider: string): Promise<string> {
+  const res = await fetch(`${API_BASE}/api/me/links/${encodeURIComponent(provider)}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!res.ok) {
+    let detail = `Could not start linking (${res.status})`;
+    try { const b = await res.json(); if (b?.error) detail = b.error; } catch { /* keep default */ }
+    throw new Error(detail);
+  }
+  return (await res.json() as { authUrl: string }).authUrl;
 }

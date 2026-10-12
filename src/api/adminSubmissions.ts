@@ -9,7 +9,7 @@ export interface PendingSubmission {
   summary: string;
   submitterNote: string | null;
   submitter: string | null;   // display name, or null for anonymous
-  submitterSub: string | null; // their Authentik subject (stable user id), or null
+  submitterSub: string | null; // their Zitadel user id (stable), or null
   screenshot: string | null;  // URL path, e.g. /api/admin/uploads/<file>
   // Uncropped upload, kept only while an auto-cropped screenshot is pending.
   screenshotOriginal: string | null;

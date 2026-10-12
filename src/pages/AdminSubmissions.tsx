@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useAuth } from 'react-oidc-context';
+import { hasRole, ADMIN_ROLE } from '../auth/roles';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   listPending, approveSubmission, rejectSubmission, editSubmission, approveBatch, rejectBatch,
@@ -12,14 +13,10 @@ import AuthedImage from '../components/AuthedImage';
 import CropDialog from '../components/CropDialog';
 import { useComboEditor } from '../hooks/useComboEditor';
 
-// pfdb_groups arrives with the "pfdb-" prefix stripped, so "pfdb-admins" → "admins".
-const ADMIN_GROUP = 'admins';
-
 export default function AdminSubmissions() {
   const auth = useAuth();
   const idToken = auth.user?.id_token;
-  const groups = (auth.user?.profile?.pfdb_groups as string[] | undefined) ?? [];
-  const isAdmin = groups.includes(ADMIN_GROUP);
+  const isAdmin = hasRole(auth.user, ADMIN_ROLE);
 
   const { data: pending, isLoading } = useQuery({
     queryKey: ['admin-pending'],

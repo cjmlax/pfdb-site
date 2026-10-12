@@ -51,9 +51,7 @@ export interface DisplayNameOption {
 
 export function useDisplayName() {
   const auth = useAuth();
-  const claims = auth.user?.profile;
   const idToken = auth.user?.id_token;
-  const connected = (claims?.connected_accounts as Record<string, string> | undefined) ?? {};
 
   // Shares the ['me'] cache with Account.tsx — no extra fetch when already loaded.
   const { data: profile } = useQuery({
@@ -61,6 +59,8 @@ export function useDisplayName() {
     queryFn: () => fetchMe(idToken!),
     enabled: auth.isAuthenticated && !!idToken,
   });
+  // Linked platforms, read from Zitadel by the worker.
+  const connected = profile?.connected_accounts ?? {};
 
   // The worker holds the choice (it names the user in public credits); the
   // localStorage copy just avoids a flash before the profile loads.
@@ -96,7 +96,7 @@ export function useDisplayName() {
   ].filter(o => o.name);
 
   const current = options.find(o => o.key === source) ?? options[0];
-  const displayName = current?.name || String(claims?.preferred_username ?? claims?.name ?? 'Account');
+  const displayName = current?.name || profile?.username || 'Account';
 
   return { displayName, source, setSource, options, current, connectedKeys: Object.keys(connected) };
 }

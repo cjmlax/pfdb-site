@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useAuth } from 'react-oidc-context';
+import { hasRole, ADMIN_ROLE } from '../auth/roles';
 import { useTheme } from '../hooks/useTheme';
 import { useBreedSort, selectBreedSort } from '../hooks/useBreedSort';
 import { useColorSort, selectColorSort } from '../hooks/useColorSort';
@@ -212,9 +213,6 @@ function NavDropdown({ label, links }: { label: string; links: MenuLink[] }) {
 
 // ── Settings dropdown ─────────────────────────────────────────────────────────
 
-// pfdb_groups arrives with the "pfdb-" prefix stripped, so "pfdb-admins" → "admins".
-const ADMIN_GROUP = 'admins';
-
 function SettingsDropdown() {
   const { theme, choose } = useTheme();
   const breedSort = useBreedSort();
@@ -227,8 +225,7 @@ function SettingsDropdown() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const groups = (auth.user?.profile?.pfdb_groups as string[] | undefined) ?? [];
-  const isAdmin = groups.includes(ADMIN_GROUP);
+  const isAdmin = hasRole(auth.user, ADMIN_ROLE);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {

@@ -3618,8 +3618,8 @@ a.csv-btn {
   border-color: var(--border);
 }
 
-/* Per-source "connect" tile — links out straight to that provider's OIDC
-   login. Distinct from .display-name-opt (dashed border, no dim/active toggle
+/* Per-provider "connect" tile — starts linking that provider to the account.
+   Distinct from .display-name-opt (dashed border, no dim/active toggle
    states) since it's an add action, not a selectable option; stretches to
    match sibling tile height via the row's default flex align-items: stretch. */
 .display-name-add {
@@ -3633,12 +3633,17 @@ a.csv-btn {
   background: transparent;
   color: var(--text);
   opacity: 0.55;
+  font: inherit;
   cursor: pointer;
   text-decoration: none;
   transition: opacity 0.15s, border-color 0.15s, background 0.15s, color 0.15s;
 }
 
-.display-name-add:hover {
+.display-name-add:disabled {
+  cursor: wait;
+}
+
+.display-name-add:hover:not(:disabled) {
   opacity: 1;
   border-color: var(--accent-border);
   background: var(--accent-bg);

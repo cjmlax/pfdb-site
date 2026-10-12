@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from 'react-oidc-context';
+import { hasRole, ADMIN_ROLE } from '../auth/roles';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   adminListBadges, adminSaveBadge, adminDeleteBadge,
@@ -8,8 +9,6 @@ import {
 import type { Badge } from '../api/profile';
 import { badgeChipStyle } from '../utils/badgeStyle';
 
-// pfdb_groups arrives with the "pfdb-" prefix stripped, so "pfdb-admins" → "admins".
-const ADMIN_GROUP = 'admins';
 // Matches AUTO_BADGE_IDS in the worker's users.ts — auto-granted/revoked based on
 // live admins-/mods-group membership, so a manual revoke here would just reappear
 // on that user's next request. The catalog entries (name/icon/color) are still
@@ -21,8 +20,7 @@ export default function AdminBadges() {
   const auth = useAuth();
   const idToken = auth.user?.id_token;
   const queryClient = useQueryClient();
-  const groups = (auth.user?.profile?.pfdb_groups as string[] | undefined) ?? [];
-  const isAdmin = groups.includes(ADMIN_GROUP);
+  const isAdmin = hasRole(auth.user, ADMIN_ROLE);
   const enabled = auth.isAuthenticated && isAdmin && !!idToken;
 
   const badgesQuery = useQuery({ queryKey: ['admin-badges'], queryFn: () => adminListBadges(idToken!), enabled });
@@ -189,7 +187,7 @@ export default function AdminBadges() {
                     disabled={removeUser.isPending}
                     title="Remove this user from the database"
                     onClick={() => {
-                      if (confirm(`Remove "${u.username ?? u.sub}" from the database? This deletes their profile, flair, and badges. Do this only after removing them in Authentik — an active user is recreated on next sign-in.`)) {
+                      if (confirm(`Remove "${u.username ?? u.sub}" from the database? This deletes their profile, flair, and badges. Do this only after removing them in Zitadel — an active user is recreated on next sign-in.`)) {
                         removeUser.mutate(u.sub);
                       }
                     }}
