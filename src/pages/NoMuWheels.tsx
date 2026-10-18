@@ -507,7 +507,7 @@ export default function NoMuWheels() {
                   <h3>Habitat {h + 1}</h3>
                   <span className="planner-count">{frogs.length} / {HABITAT_SIZE}</span>
                   {frogs.length > 0 && (
-                    <Link className="csv-btn" to={`/habitat${frogSearch('frogs', frogIdsParam(frogs))}`}>
+                    <Link className="csv-btn" to={`/planner${frogSearch('frogs', frogIdsParam(frogs))}`}>
                       Open in Planner
                     </Link>
                   )}
@@ -711,7 +711,7 @@ export default function NoMuWheels() {
                               {!g.verified && (
                                 <>
                                   {' · '}
-                                  <Link to={`/habitat${frogSearch('frogs', frogIdsParam([g.a, g.b]))}`}>Open in Planner</Link>
+                                  <Link to={`/planner${frogSearch('frogs', frogIdsParam([g.a, g.b]))}`}>Open in Planner</Link>
                                 </>
                               )}
                             </td>
@@ -772,7 +772,7 @@ function ResultButton({ wheel, title, active, secs, onSelect }: {
 // A pair links to its Breeding Pairs page.
 function PairLink({ a, b, nameOf }: { a: string; b: string; nameOf: (id: string) => string }) {
   return (
-    <Link to={`/breeding${frogSearch('pair', frogIdsParam([a, b]))}`}>
+    <Link to={`/pairs${frogSearch('pair', frogIdsParam([a, b]))}`}>
       {nameOf(a)} × {nameOf(b)}
     </Link>
   );

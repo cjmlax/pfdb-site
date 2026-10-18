@@ -13,6 +13,9 @@ import SubmitCombo from './pages/SubmitCombo';
 import SubmitFrogStats from './pages/SubmitFrogStats';
 import SubmitMutationCompletion from './pages/SubmitMutationCompletion';
 import Download from './pages/Download';
+import About from './pages/About';
+import Faq from './pages/Faq';
+import Changelog from './pages/Changelog';
 import Account from './pages/Account';
 import AuthCallback from './pages/AuthCallback';
 import AdminHome from './pages/AdminHome';
@@ -38,18 +41,20 @@ const router = createBrowserRouter([
       { path: 'frog/:frogId', element: <Frog /> },
       { path: 'weekly', element: <WeeklyList /> },
       { path: 'breed', element: <Breed /> },
-      { path: 'breeding', element: <BreedingPairs /> },
-      { path: 'habitat', element: <HabitatPlanner /> },
+      { path: 'pairs', element: <BreedingPairs /> },
+      { path: 'planner', element: <HabitatPlanner /> },
       { path: 'tree', element: <PairTree /> },
-      { path: 'nomu', element: <NoMuWheels /> },
-      { path: 'submit', element: <SubmitCombo /> },
+      { path: 'wheel', element: <NoMuWheels /> },
+      { path: 'submit/mutations', element: <SubmitCombo /> },
       { path: 'submit/stats', element: <SubmitFrogStats /> },
       { path: 'submit/details', element: <SubmitMutationCompletion /> },
       { path: 'download', element: <Download /> },
+      { path: 'about', element: <About /> },
+      { path: 'faq', element: <Faq /> },
+      { path: 'changelog', element: <Changelog /> },
       { path: 'frogs', element: <Moved to="/search" /> },
       { path: 'breeds', element: <Moved to="/breed" /> },
       { path: 'downloads', element: <Moved to="/download" /> },
-      { path: 'planner', element: <Moved to="/habitat" /> },
       { path: 'account', element: <Account /> },
       { path: 'admin', element: <AdminHome /> },
       { path: 'admin/badges', element: <AdminBadges /> },

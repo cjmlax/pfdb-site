@@ -137,16 +137,22 @@ const VIEW_LINKS: MenuLink[] = [
 ];
 
 const CALCULATE_LINKS: MenuLink[] = [
-  { to: '/breeding', label: 'Breeding Pairs' },
-  { to: '/habitat',  label: 'Habitat Planner' },
+  { to: '/pairs',    label: 'Breeding Pairs' },
+  { to: '/planner',  label: 'Habitat Planner' },
   { to: '/tree',     label: 'Pair Tree' },
-  { to: '/nomu',     label: 'NoMu Wheels' },
+  { to: '/wheel',    label: 'NoMu Wheels' },
 ];
 
 const SUBMIT_LINKS: MenuLink[] = [
-  { to: '/submit',       label: 'Mutations', end: true },
+  { to: '/submit/mutations', label: 'Mutations' },
   { to: '/submit/stats', label: 'Frog Stats' },
   { to: '/submit/details', label: 'Mutation Details' },
+];
+
+const INFO_LINKS: MenuLink[] = [
+  { to: '/about',     label: 'About' },
+  { to: '/faq',       label: 'FAQ' },
+  { to: '/changelog', label: 'Changelog' },
 ];
 
 // Segment-aware, so /frog matches /frog/18:11:0 but not /frogs.
@@ -362,6 +368,7 @@ function NavBar() {
       <NavDropdown label="Calculate" links={CALCULATE_LINKS} />
       <NavDropdown label="Submit" links={SUBMIT_LINKS} />
       <NavLink to="/download">Download</NavLink>
+      <NavDropdown label="Info" links={INFO_LINKS} />
     </nav>
   );
 }

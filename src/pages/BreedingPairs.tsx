@@ -420,7 +420,7 @@ export default function BreedingPairs() {
                     Hidden for verified pairs (and until that's known), which refuse submissions. */}
                 {pairVerified === false && (
                   <Link
-                    to={`/submit${frogSearch('pair', searchParams.get('pair') ?? '')}`}
+                    to={`/submit/mutations${frogSearch('pair', searchParams.get('pair') ?? '')}`}
                     className="screenshot-btn"
                     aria-label="Submit a Glass/Chroma mutation for this pair"
                     title="Submit a Glass/Chroma mutation for this pair"

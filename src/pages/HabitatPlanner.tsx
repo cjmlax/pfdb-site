@@ -345,7 +345,7 @@ export default function HabitatPlanner() {
   const refreshPairs = useCallback(() => queryClient.invalidateQueries({ queryKey: ['pairs'] }), [queryClient]);
 
   const pairHref = (fa: PlannedFrog, fb: PlannedFrog) =>
-    lookup ? `/breeding${frogSearch('pair', encodeFrogParam([fa.sel, fb.sel], lookup))}` : '/breeding';
+    lookup ? `/pairs${frogSearch('pair', encodeFrogParam([fa.sel, fb.sel], lookup))}` : '/pairs';
 
   // ── Editing ───────────────────────────────────────────────────────────────
 

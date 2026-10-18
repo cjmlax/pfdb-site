@@ -72,7 +72,9 @@ a.plain-link:hover {
   flex-direction: column;
   gap: 6px;
   position: sticky;
-  top: 68px; /* clears the 52px nav bar + a small gap */
+  /* clears the 52px nav bar + a small gap; home sidebar cards add the height
+     of the cards above them (set by useStackedCards) */
+  top: calc(68px + var(--stack-offset, 0px));
 }
 
 /* Frog list inside the weekly set card */
@@ -374,6 +376,211 @@ a.plain-link:hover {
   font-size: 13px;
   padding: 8px 18px;
   opacity: 0.6;
+}
+
+/* Link row pinned below the scrolling feed */
+.updates-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 -18px;
+  padding: 8px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--code-bg);
+  border-radius: 0 0 6px 6px;
+}
+
+.updates-footer-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.updates-footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Changelog page: the same feed, wider and as tall as the viewport allows */
+.updates-panel--full {
+  max-width: 960px;
+}
+
+.updates-panel--full .updates-feed {
+  max-height: calc(100vh - 220px);
+  min-height: 300px;
+}
+
+/* ─── FAQ page ───────────────────────────────────────────────────────────── */
+
+.faq {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.faq-main {
+  flex: 1;
+  min-width: 0;
+  max-width: 760px;
+}
+
+.faq-section {
+  margin-bottom: 28px;
+  scroll-margin-top: 68px; /* clears the sticky nav bar */
+}
+
+.faq-section-title {
+  font-size: 18px;
+  margin: 0 0 10px;
+}
+
+.faq-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  margin-bottom: 8px;
+  scroll-margin-top: 68px;
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  font-weight: 600;
+  color: var(--text-h);
+  cursor: pointer;
+  list-style: none;
+  border-radius: 6px;
+}
+
+.faq-question::-webkit-details-marker { display: none; }
+
+.faq-question:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.faq-item[open] > .faq-question {
+  border-bottom: 1px solid var(--border);
+  border-radius: 6px 6px 0 0;
+}
+
+.faq-item[open] > .faq-question .weekly-expand-arrow {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  padding: 4px 18px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.faq-answer p {
+  margin: 10px 0;
+}
+
+/* Contents card: a sticky sidebar like the home page cards */
+.faq-toc-wrap {
+  flex-shrink: 0;
+  position: sticky;
+  top: 68px;
+}
+
+.faq-toc {
+  width: 220px;
+  position: static;
+  max-height: calc(100vh - 88px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* The toggle is the mobile header; on wide screens the plain label shows */
+.faq-toc-toggle {
+  display: none;
+}
+
+.faq-toc-list,
+.faq-toc-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.faq-toc-list > li {
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+}
+
+.faq-toc-list > li:first-child {
+  border-top: none;
+}
+
+.faq-toc-section {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.faq-toc-items {
+  margin-top: 4px;
+}
+
+.faq-toc-item {
+  display: block;
+  padding: 3px 0 3px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.faq-toc-section:hover,
+.faq-toc-item:hover {
+  color: var(--accent);
+}
+
+/* Small screens: contents move between the title and the questions and
+   collapse behind a caret. As on the home page, .faq-main's box is removed so
+   its children and the contents card can be ordered. */
+@media (max-width: 768px) {
+  .faq {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .faq-main { display: contents; }
+  .faq-main > h1   { order: 1; }
+  .faq-toc-wrap    { order: 2; }
+  .faq-section     { order: 3; }
+
+  .faq-toc-wrap {
+    position: static;
+    margin-bottom: 20px;
+  }
+
+  .faq-toc {
+    width: auto;
+    max-height: none;
+  }
+
+  .faq-toc-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .faq-toc-label { display: none; }
+  .faq-toc:not(.open) .faq-toc-list { display: none; }
+  .faq-toc.open .faq-toc-list { margin-top: 6px; }
 }
 
 /* ─── Links card ─────────────────────────────────────────────────────────── */
@@ -2322,9 +2529,9 @@ tr:hover .pin-btn,
 /* The nav never scrolls: its text shrinks with the viewport so every item
    fits on one line. Spacing is in em so it shrinks with the text. */
 .nav-links {
-  /* Full size until ~560px wide, then scales with the viewport (≈28em of
+  /* Full size until ~610px wide, then scales with the viewport (≈32em of
      content must fit beside the settings button). */
-  --nav-fs: clamp(9px, calc(3.2vw - 2px), 15px);
+  --nav-fs: clamp(9px, calc(2.8vw - 2px), 15px);
   display: flex;
   flex: 1;
   min-width: 0;

@@ -136,10 +136,11 @@ export default function Breed() {
   const tableRef = useRef<HTMLTableElement>(null);
 
   // Single breed state — updated immediately when user confirms a selection.
-  // Clearing the ComboBox keeps the previous breed visible.
-  const [breed, setBreed] = useState<ComboOption | null>(() => {
-    const id = searchParams.get('breedId'), label = searchParams.get('breedLabel');
-    return id && label ? { id, label } : null;
+  // Clearing the ComboBox keeps the previous breed visible. A breed restored
+  // from ?breed=<name> starts with an empty id until the breeds table resolves it.
+  const [picked, setBreed] = useState<ComboOption | null>(() => {
+    const name = searchParams.get('breed');
+    return name ? { id: '', label: name } : null;
   });
 
   // Stat is independent of the breed query — changing it recomputes gridMap
@@ -149,15 +150,25 @@ export default function Breed() {
     return STAT_OPTIONS.find(o => o.value === s)?.value ?? 'Value';
   });
 
+  const { data: breeds } = useQuery({ queryKey: ['table', 'breeds'], queryFn: () => fetchTable<BreedFields>('breeds') });
+
+  // Resolve a URL-restored breed name to its record (case-insensitive); null
+  // if no breed has that name.
+  const breed = useMemo<ComboOption | null>(() => {
+    if (!picked || picked.id || !breeds) return picked;
+    const name = picked.label.toLowerCase();
+    const rec = breeds.find(b => b.fields.Breed?.toLowerCase() === name);
+    return rec ? { id: rec.id, label: rec.fields.Breed! } : null;
+  }, [picked, breeds]);
+  const resolvingBreed = breed !== null && !breed.id;
+
   useEffect(() => {
     if (!breed) return;
     setSearchParams(
-      { breedId: breed.id, breedLabel: breed.label, stat },
+      { breed: breed.label, stat },
       { replace: true },
     );
   }, [breed, stat, setSearchParams]);
-
-  const { data: breeds } = useQuery({ queryKey: ['table', 'breeds'], queryFn: () => fetchTable<BreedFields>('breeds') });
   const { data: bases  } = useQuery({ queryKey: ['table', 'bases'],  queryFn: () => fetchTable<BaseFields>('bases')  });
   const { data: secs   } = useQuery({ queryKey: ['table', 'secs'],   queryFn: () => fetchTable<SecFields>('secs')    });
   const { data: levels } = useQuery({ queryKey: ['table', 'levels'], queryFn: () => fetchTable<LevelFields>('levels') });
@@ -183,7 +194,7 @@ export default function Breed() {
   const { data: frogs, isFetching, error } = useQuery({
     queryKey: ['breed-frogs', breed?.id],
     queryFn:  () => fetchBreedFrogs<FrogFields>(breed!.id),
-    enabled:  breed !== null,
+    enabled:  !!breed?.id,
     staleTime: 1000 * 60 * 60 * 24,
   });
 
@@ -386,7 +397,7 @@ export default function Breed() {
           label="Breed"
           options={breedOptions}
           presorted
-          initialSelection={breed}
+          initialSelection={picked}
           onSelect={opt => { if (opt) setBreed(opt); }}
         />
         <div className="combobox-field">
@@ -459,7 +470,7 @@ export default function Breed() {
 
       {breed === null ? (
         <p className="search-hint">Select a breed above to display details.</p>
-      ) : isFetching ? (
+      ) : isFetching || resolvingBreed ? (
         <p className="search-hint">Loading frogs for {breed.label}…</p>
       ) : bases && secs ? (
         <>

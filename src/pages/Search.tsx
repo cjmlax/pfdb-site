@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Link, useSearchParams } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import {
   useReactTable,
   getCoreRowModel,
@@ -10,14 +10,14 @@ import {
   flexRender,
   type SortingState,
 } from '@tanstack/react-table';
-import { fetchTable, searchFrogs, type TeableRecord, type FrogFilter } from '../api/teable';
+import { fetchTable, searchFrogs, fetchFrogByFrogId, type TeableRecord, type FrogFilter } from '../api/teable';
 import ComboBox, { type ComboOption } from '../components/ComboBox';
 import { formatNum } from '../utils/format';
 import { breedOptionsFrom, breedLevel } from '../utils/breeds';
 import { useBreedSort } from '../hooks/useBreedSort';
 import { useColorSort } from '../hooks/useColorSort';
 import { colorOptionsFrom } from '../utils/colors';
-import { MAX_PLANNER_FROGS, frogIdsParam } from '../utils/frogIds';
+import { MAX_PLANNER_FROGS, frogIdsParam, frogSearch, parseFrogId } from '../utils/frogIds';
 
 interface BreedFields  extends Record<string, unknown> { Breed?:      string }
 interface BaseFields   extends Record<string, unknown> { BaseColors?: string }
@@ -34,8 +34,6 @@ interface FrogFields extends Record<string, unknown> {
   Stamina?:   number;
 }
 
-// Stores a filter selection as both its record ID (for the API) and display label
-// (for restoring the ComboBox text on remount)
 type FilterSelection = ComboOption; // { id: string; label: string }
 
 interface SearchState {
@@ -44,16 +42,10 @@ interface SearchState {
   secondary?: FilterSelection;
 }
 
-/** Read filter selections out of URL search params */
-function stateFromParams(p: URLSearchParams): SearchState {
-  const s: SearchState = {};
-  const breedId = p.get('breedId'), breedLabel = p.get('breedLabel');
-  const baseId  = p.get('baseId'),  baseLabel  = p.get('baseLabel');
-  const secId   = p.get('secId'),   secLabel   = p.get('secLabel');
-  if (breedId && breedLabel) s.breed     = { id: breedId, label: breedLabel };
-  if (baseId  && baseLabel)  s.base      = { id: baseId,  label: baseLabel  };
-  if (secId   && secLabel)   s.secondary = { id: secId,   label: secLabel   };
-  return s;
+// Frog_IDs from ?pinned=18:11:0_18:4:0, normalised and de-duplicated.
+function pinnedIdsFromParam(param: string | null): string[] {
+  const ids = (param ?? '').split('_').map(parseFrogId).filter((id): id is string => !!id);
+  return [...new Set(ids)];
 }
 
 function IconPin() {
@@ -124,31 +116,17 @@ const col = createColumnHelper<TeableRecord<FrogFields>>();
 
 
 export default function Search() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Pending filter — updated as user makes ComboBox selections
-  const [selection, setSelection] = useState<SearchState>(() => stateFromParams(searchParams));
+  const [selection, setSelection] = useState<SearchState>({});
 
-  // Committed filter — drives the API query; also restored from URL on remount
-  const [submitted, setSubmitted] = useState<SearchState | null>(() => {
-    const s = stateFromParams(searchParams);
-    return Object.keys(s).length > 0 ? s : null;
-  });
+  // Committed filter — drives the API query
+  const [submitted, setSubmitted] = useState<SearchState | null>(null);
 
-  const [sorting, setSorting] = useState<SortingState>(() => {
-    const s = searchParams.get('sort'), d = searchParams.get('dir');
-    return s ? [{ id: s, desc: d !== 'asc' }] : [];
-  });
-  // Sync URL whenever committed state or result sort changes.
-  // Uses replace:true so every change doesn't create a browser history entry.
-  useEffect(() => {
-    const params: Record<string, string> = {};
-    if (submitted?.breed)     { params.breedId = submitted.breed.id; params.breedLabel = submitted.breed.label; }
-    if (submitted?.base)      { params.baseId  = submitted.base.id;  params.baseLabel  = submitted.base.label;  }
-    if (submitted?.secondary) { params.secId   = submitted.secondary.id; params.secLabel = submitted.secondary.label; }
-    if (submitted && sorting.length) { params.sort = sorting[0].id; params.dir = sorting[0].desc ? 'desc' : 'asc'; }
-    setSearchParams(params, { replace: true });
-  }, [submitted, sorting, setSearchParams]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   // ── Lookup tables (small, ETag-cached) ──────────────────────────────────
   const { data: breeds } = useQuery({ queryKey: ['table', 'breeds'], queryFn: () => fetchTable<BreedFields>('breeds') });
@@ -233,11 +211,35 @@ export default function Search() {
     );
   }, []);
 
-  // Auto-submit whenever any filter is populated. Skip the initial mount so
-  // URL-restored sort/filter state isn't wiped on first render.
-  const initialized = useRef(false);
+  // The comparison list lives in the URL as Frog_IDs (?pinned=18:11:0_18:4:0)
+  // so it can be shared. On load, fetch those frogs once to seed the list.
+  const [restoreIds] = useState(() => pinnedIdsFromParam(searchParams.get('pinned')));
+  const [restored, setRestored] = useState(restoreIds.length === 0);
+  const restoreQueries = useQueries({
+    queries: restoreIds.map(id => ({
+      queryKey:  ['frog-code', id],
+      queryFn:   () => fetchFrogByFrogId<FrogFields>(id),
+      enabled:   !restored,
+      staleTime: 1000 * 60 * 60 * 24,
+    })),
+  });
+  const restorePending = restoreQueries.some(q => q.isPending);
   useEffect(() => {
-    if (!initialized.current) { initialized.current = true; return; }
+    if (restored || restorePending) return;
+    setPinned(restoreQueries.flatMap(q => (q.data ? [q.data] : [])));
+    setRestored(true);
+  }, [restored, restorePending, restoreQueries]);
+
+  // Sync URL with the pinned list (after restoring, so it isn't wiped first).
+  // Written by hand via frogSearch so the colons aren't escaped.
+  useEffect(() => {
+    if (!restored) return;
+    const next = frogSearch('pinned', frogIdsParam(pinned.map(r => r.fields.Frog_ID)));
+    if (location.search !== next) navigate({ search: next }, { replace: true });
+  }, [restored, pinned, location.search, navigate]);
+
+  // Auto-submit whenever any filter is populated.
+  useEffect(() => {
     if (selection.breed || selection.base || selection.secondary) {
       setSubmitted({ ...selection });
       setSorting([]);
@@ -332,13 +334,15 @@ export default function Search() {
         </>
       )}
 
+      {!restored && <p className="search-hint">Loading pinned frogs…</p>}
+
       {pinned.length > 0 && (
         <div className="pinned-section">
           <div className="pinned-header">
             <div className="pinned-title">
               <h2 style={{ margin: 0 }}>Comparison</h2>
               <ComparisonLink
-                to={`/habitat?frogs=${frogIdsParam(pinned.map(r => r.fields.Frog_ID))}`}
+                to={`/planner?frogs=${frogIdsParam(pinned.map(r => r.fields.Frog_ID))}`}
                 enabled={pinned.length <= MAX_PLANNER_FROGS}
                 label="Open these frogs in the Habitat Planner"
                 disabledLabel={`The Habitat Planner holds up to ${MAX_PLANNER_FROGS} frogs`}
@@ -346,7 +350,7 @@ export default function Search() {
                 <IconPlanner />
               </ComparisonLink>
               <ComparisonLink
-                to={`/breeding?pair=${frogIdsParam(pinned.map(r => r.fields.Frog_ID))}`}
+                to={`/pairs?pair=${frogIdsParam(pinned.map(r => r.fields.Frog_ID))}`}
                 enabled={pinned.length === 2}
                 label="Open this pair in Breeding Pairs"
                 disabledLabel="Pin exactly 2 frogs to open them in Breeding Pairs"

@@ -266,7 +266,7 @@ export default function PairTree() {
   }, [list, root, pairByKey]);
 
   const pairHref = (f: TreeFrog) =>
-    root && lookup ? `/breeding${frogSearch('pair', encodeFrogParam([root.sel, f.sel], lookup))}` : '/breeding';
+    root && lookup ? `/pairs${frogSearch('pair', encodeFrogParam([root.sel, f.sel], lookup))}` : '/pairs';
 
   return (
     <div>

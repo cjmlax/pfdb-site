@@ -173,7 +173,7 @@ export default function CombinationsTable({ rows, thisHeader }: {
                 <td className="pin-cell">
                   {row.thisTitle && row.partnerTitle && (
                     <Link
-                      to={`/breeding${frogSearch('pair', frogIdsParam([row.thisTitle, row.partnerTitle]))}`}
+                      to={`/pairs${frogSearch('pair', frogIdsParam([row.thisTitle, row.partnerTitle]))}`}
                       className="screenshot-btn"
                       aria-label={`Open ${row.thisName} × ${row.partnerName} in Breeding Pairs`}
                       title="Open in Breeding Pairs"
