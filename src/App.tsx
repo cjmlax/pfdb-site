@@ -61,6 +61,8 @@ const router = createBrowserRouter([
       { path: 'admin/alerts', element: <AdminAlerts /> },
       { path: 'admin/submissions', element: <AdminSubmissions /> },
       { path: 'auth/callback', element: <AuthCallback /> },
+      // Unknown paths (broken or retired links) land on the home page.
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
 ]);
