@@ -429,6 +429,7 @@ a.plain-link:hover {
 }
 
 .faq-section-title {
+  color: var(--accent);
   font-size: 18px;
   margin: 0 0 10px;
 }
@@ -448,6 +449,8 @@ a.plain-link:hover {
   justify-content: space-between;
   gap: 12px;
   padding: 12px 18px;
+  font-size: 0.875rem;
+  line-height: 1.45rem; /* matches the root line height so the box keeps its size */
   font-weight: 600;
   color: var(--text-h);
   cursor: pointer;
@@ -500,8 +503,7 @@ a.plain-link:hover {
   display: none;
 }
 
-.faq-toc-list,
-.faq-toc-items {
+.faq-toc-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -523,21 +525,7 @@ a.plain-link:hover {
   text-decoration: none;
 }
 
-.faq-toc-items {
-  margin-top: 4px;
-}
-
-.faq-toc-item {
-  display: block;
-  padding: 3px 0 3px 10px;
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--text);
-  text-decoration: none;
-}
-
-.faq-toc-section:hover,
-.faq-toc-item:hover {
+.faq-toc-section:hover {
   color: var(--accent);
 }
 

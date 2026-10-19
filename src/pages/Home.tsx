@@ -350,14 +350,6 @@ export default function Home() {
         <h1>Pocket Frogs Database</h1>
         <SiteSummaryCard />
         <UpdateFeedCard />
-        <div className="home-text">
-          <p>An unofficial, searchable database of information for the mobile game Pocket Frogs.</p>
-          <p>This website is a continuation of my <a href="https://docs.google.com/spreadsheets/d/1TNTK09vM8tlj6BC8haobuWCQvV4qNyDsRYsf-4hXdCc/" target="_blank">Google Spreadsheet</a> meant to store the data better, provide a simpler and more responsive feel, and separate it from Google so it can expand past just a spreadshet.</p>
-          <p>This site is also still a hobby project for me, and is currently a work in progress. Please be patient while I work out broken features and add additional ones. I will post site alerts when I expect things to change, but things may break unexpectedly.</p>
-          <p>Note that the site data is hosted in a database detached from the site and so isn't affected by site changes. I am not currently offering API access to the databse, but components can be downloaded from the corresponding page. This includes hashes and timestamps to verify if your data is accurate to the currently stored data.</p>
-          <p>Finally, I will caveat that this site was built primarily with AI assistance, though the site does not use any AI within it. All data is community-contributed and calculations/algorithms are hard-coded into the pages. This site only uses external identity providers for accounts and only records the necessary data to uniquely identify a user (email and username).</p>
-          <p>Site contact methods and FAQ pages are upcoming, please check back later to submit questions, concerns, feedback, or feature requests.</p>
-        </div>
       </div>
       <div className="home-cards" ref={cardsRef}>
         <WeeklySetCard />
