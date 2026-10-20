@@ -1,7 +1,7 @@
 import type { FrogPair, Mutation } from '../api/teable';
 
-// ── NoMu (no mutation) colour wheels ───────────────────────────────────────
-// A wheel is one frog per base colour, all of one breed, bred together to
+// ── Color wheels ──────────────────────────────────────────────────────────
+// A wheel is one frog per base color, all of one breed, bred together to
 // complete that breed's Froggydex: every base × secondary. A pair's offspring
 // take the base of one parent and the secondary of either, so the frog
 // (base b, secondary s) can only come from pairing the wheel's base-b frog
@@ -16,13 +16,15 @@ import type { FrogPair, Mutation } from '../api/teable';
 // the pairs still to record.
 //
 // Modes:
-//   nomu     — every frog comes from its parents' colours; mutations only matter
+//   clean    — every frog comes from its parents' colors, and a Verified pair
+//              with any recorded mutation can't be used at all.
+//   nomu     — every frog comes from its parents' colors; mutations only matter
 //              for what they take away.
 //   mutation — a Verified pair's mutation results count too, so Glass and Chroma
 //              frogs can come from mutations, and the Glass frog is optional
 //              (a 22-frog wheel, if mutations cover all of Glass).
 
-export type WheelMode = 'nomu' | 'mutation';
+export type WheelMode = 'clean' | 'nomu' | 'mutation';
 
 export interface WheelInput {
   breed: string;            // Breed_ID
@@ -101,7 +103,7 @@ export function createWheelSolver(input: WheelInput): WheelSolver {
   // ── Recorded data ─────────────────────────────────────────────────────────
   // Verified pairs within the breed, and what each one loses. A mutation with
   // no Lost Frog recorded could have taken either parent's value of the
-  // mutated colour, so both candidates count as lost.
+  // mutated color, so both candidates count as lost.
   const lostBy = new Map<number, Set<number>>();
   const verifiedPairIds = new Map<string, number>();
   for (const p of input.pairs) {
@@ -114,9 +116,11 @@ export function createWheelSolver(input: WheelInput): WheelSolver {
   }
 
   const mutationSources: MutationSource[] = [];
+  const mutated = new Set<number>(); // Verified pairs with any recorded mutation
   for (const m of input.mutations) {
     const n = verifiedPairIds.get(m.pairId);
     if (n == null) continue;
+    mutated.add(n);
     const a = Math.floor(n / NF), b = n % NF;
     const result = frogOf(m.resultTitle);
     const lost = lostBy.get(n)!;
@@ -135,14 +139,16 @@ export function createWheelSolver(input: WheelInput): WheelSolver {
   }
 
   // cross[a * NF + b]: can pair a × b be relied on for (base of a, sec of b)?
+  // In clean mode a pair with any mutation can't be relied on for anything.
   const cross = new Uint8Array(NF * NF);
   const knownDegree = new Uint16Array(NF);
   for (const [n, lost] of lostBy) {
     const a = Math.floor(n / NF), b = n % NF;
     if (a === b) continue;
-    cross[a * NF + b] = lost.has(baseOf(a) * NS + secOf(b)) ? BAD : GOOD;
-    cross[b * NF + a] = lost.has(baseOf(b) * NS + secOf(a)) ? BAD : GOOD;
-    if (baseOf(a) !== baseOf(b)) { knownDegree[a]++; knownDegree[b]++; }
+    const tainted = mode === 'clean' && mutated.has(n);
+    cross[a * NF + b] = tainted || lost.has(baseOf(a) * NS + secOf(b)) ? BAD : GOOD;
+    cross[b * NF + a] = tainted || lost.has(baseOf(b) * NS + secOf(a)) ? BAD : GOOD;
+    if (!tainted && baseOf(a) !== baseOf(b)) { knownDegree[a]++; knownDegree[b]++; }
   }
 
   const useMutations = mode === 'mutation';

@@ -1922,9 +1922,9 @@ a.tree-name:hover { color: var(--accent); }
   outline-offset: -1px;
 }
 
-/* ─── NoMu Wheels page ─────────────────────────────────────────────────────── */
+/* ─── Color Wheels page ─────────────────────────────────────────────────────── */
 
-.nomu-mode-btn {
+.color-mode-btn {
   width: auto;
   padding: 0 14px;
   font-size: 14px;
@@ -1932,36 +1932,106 @@ a.tree-name:hover { color: var(--accent); }
 }
 
 /* In a toolbar the toggle sizes to its labels instead of stretching */
-.nomu-view-toggle .settings-theme-opt {
+.color-view-toggle .settings-theme-opt {
   flex: none;
 }
 
-.nomu-head-actions {
+.color-head-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.nomu-results {
+.color-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.color-lock-all[aria-pressed='true'] {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+/* Save-preset dialog */
+.color-save-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.color-save-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-h);
+}
+
+.color-save-name {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.color-save-list {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin: 0;
+  padding: 8px 12px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.color-save-list legend {
+  padding: 0 4px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.color-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+}
+
+.color-save-delete {
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.color-save-delete:hover,
+.color-save-delete.is-confirm {
+  color: var(--cell-min-text);
+}
+
+.color-results {
   display: grid;
   gap: 4px 24px;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   margin-bottom: 8px;
 }
 
-.nomu-result-group h2,
-.nomu-section-head h2 {
+.color-result-group h2,
+.color-section-head h2 {
   margin: 16px 0 10px;
   font-size: 18px;
 }
 
-.nomu-result-list {
+.color-result-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.nomu-result {
+.color-result {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -1977,22 +2047,22 @@ a.tree-name:hover { color: var(--accent); }
   cursor: pointer;
 }
 
-.nomu-result strong {
+.color-result strong {
   color: var(--text-h);
   font-size: 14px;
 }
 
-.nomu-result:hover {
+.color-result:hover {
   background: var(--accent-bg);
 }
 
-.nomu-result.active {
+.color-result.active {
   border-color: var(--accent-border);
   background: var(--accent-bg);
   box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
-.nomu-section-head {
+.color-section-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -2000,39 +2070,39 @@ a.tree-name:hover { color: var(--accent); }
   gap: 8px 16px;
 }
 
-.nomu-habitats {
+.color-habitats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
   margin-bottom: 8px;
 }
 
-.nomu-habitat {
+.color-habitat {
   padding: 12px;
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: 6px;
 }
 
-.nomu-habitat-head {
+.color-habitat-head {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
 }
 
-.nomu-habitat-head h3 {
+.color-habitat-head h3 {
   margin: 0;
   font-size: 15px;
   color: var(--text-h);
 }
 
-.nomu-habitat-head .csv-btn {
+.color-habitat-head .csv-btn {
   margin-left: auto;
   text-decoration: none;
 }
 
-.nomu-slots {
+.color-slots {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
@@ -2041,8 +2111,8 @@ a.tree-name:hover { color: var(--accent); }
   list-style: none;
 }
 
-.nomu-frog,
-.nomu-slot-empty {
+.color-frog,
+.color-slot-empty {
   position: relative;
   width: 100%;
   min-height: 56px;
@@ -2052,7 +2122,7 @@ a.tree-name:hover { color: var(--accent); }
   line-height: 1.25;
 }
 
-.nomu-frog {
+.color-frog {
   display: flex;
   background: var(--bg);
   border: 2px solid var(--text-h);
@@ -2061,25 +2131,25 @@ a.tree-name:hover { color: var(--accent); }
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.nomu-frog:hover,
-.nomu-frog.is-held,
-.nomu-frog.is-editing {
+.color-frog:hover,
+.color-frog.is-held,
+.color-frog.is-editing {
   border-color: var(--accent);
 }
 
-.nomu-frog.is-held,
-.nomu-frog.is-editing {
+.color-frog.is-held,
+.color-frog.is-editing {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 /* Locked frogs are the player's own: a heavier accent outline */
-.nomu-frog.is-locked {
+.color-frog.is-locked {
   border-color: var(--accent-border);
   background: var(--accent-bg);
 }
 
 /* The name fills the tile; side padding keeps it clear of the corner icons */
-.nomu-frog-main {
+.color-frog-main {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -2096,14 +2166,14 @@ a.tree-name:hover { color: var(--accent); }
   cursor: inherit;
 }
 
-.nomu-frog-main span {
+.color-frog-main span {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.nomu-frog-icon {
+.color-frog-icon {
   position: absolute;
   top: 3px;
   display: flex;
@@ -2119,19 +2189,19 @@ a.tree-name:hover { color: var(--accent); }
   cursor: pointer;
 }
 
-.nomu-frog-icon.is-lock { left: 3px; }
-.nomu-frog-icon.is-edit { right: 3px; }
+.color-frog-icon.is-lock { left: 3px; }
+.color-frog-icon.is-edit { right: 3px; }
 
-.nomu-frog-icon:hover {
+.color-frog-icon:hover {
   background: var(--accent-bg);
   color: var(--accent);
 }
 
-.nomu-frog.is-locked .nomu-frog-icon.is-lock {
+.color-frog.is-locked .color-frog-icon.is-lock {
   color: var(--accent);
 }
 
-.nomu-slot-empty {
+.color-slot-empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2142,19 +2212,19 @@ a.tree-name:hover { color: var(--accent); }
   cursor: pointer;
 }
 
-.nomu-slot-empty.is-target {
+.color-slot-empty.is-target {
   border-color: var(--accent-border);
   font-size: 13px;
 }
 
-.nomu-slot-empty:hover,
-.nomu-slot-empty.is-editing {
+.color-slot-empty:hover,
+.color-slot-empty.is-editing {
   border-color: var(--accent-border);
   background: var(--accent-bg);
   color: var(--accent);
 }
 
-.nomu-summary {
+.color-summary {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 18px;
@@ -2163,33 +2233,33 @@ a.tree-name:hover { color: var(--accent); }
   color: var(--text-h);
 }
 
-.nomu-filter {
+.color-filter {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 14px;
 }
 
-.nomu-status { font-weight: 600; }
-.nomu-status.is-wheel    { color: var(--text-h); }
-.nomu-status.is-clear    { color: var(--cell-max-text); }
-.nomu-status.is-mutation { color: var(--warn-text); }
-.nomu-status.is-unknown  { color: var(--text); }
-.nomu-status.is-missing  { color: var(--cell-min-text); }
+.color-status { font-weight: 600; }
+.color-status.is-wheel    { color: var(--text-h); }
+.color-status.is-clear    { color: var(--cell-max-text); }
+.color-status.is-mutation { color: var(--warn-text); }
+.color-status.is-unknown  { color: var(--text); }
+.color-status.is-missing  { color: var(--cell-min-text); }
 
-.nomu-hidden {
+.color-hidden {
   color: var(--text);
   font-style: italic;
 }
 
 /* The pair view's frog lists wrap instead of stretching the table */
-td.nomu-gives {
+td.color-gives {
   white-space: normal;
   min-width: 260px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nomu-frog { transition: none; }
+  .color-frog { transition: none; }
 }
 
 /* ─── Frog lookup page ────────────────────────────────────────────────────── */

@@ -8,7 +8,7 @@ import Breed from './pages/Breed';
 import BreedingPairs from './pages/BreedingPairs';
 import HabitatPlanner from './pages/HabitatPlanner';
 import PairTree from './pages/PairTree';
-import NoMuWheels from './pages/NoMuWheels';
+import ColorWheels from './pages/ColorWheels';
 import SubmitCombo from './pages/SubmitCombo';
 import SubmitFrogStats from './pages/SubmitFrogStats';
 import SubmitMutationCompletion from './pages/SubmitMutationCompletion';
@@ -44,7 +44,7 @@ const router = createBrowserRouter([
       { path: 'pairs', element: <BreedingPairs /> },
       { path: 'planner', element: <HabitatPlanner /> },
       { path: 'tree', element: <PairTree /> },
-      { path: 'wheel', element: <NoMuWheels /> },
+      { path: 'wheel', element: <ColorWheels /> },
       { path: 'submit/mutations', element: <SubmitCombo /> },
       { path: 'submit/stats', element: <SubmitFrogStats /> },
       { path: 'submit/details', element: <SubmitMutationCompletion /> },

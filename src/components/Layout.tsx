@@ -140,7 +140,7 @@ const CALCULATE_LINKS: MenuLink[] = [
   { to: '/pairs',    label: 'Breeding Pairs' },
   { to: '/planner',  label: 'Habitat Planner' },
   { to: '/tree',     label: 'Pair Tree' },
-  { to: '/wheel',    label: 'NoMu Wheels' },
+  { to: '/wheel',    label: 'Color Wheels' },
 ];
 
 const SUBMIT_LINKS: MenuLink[] = [
