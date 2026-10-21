@@ -13,6 +13,7 @@ import { useFrogEntry } from '../hooks/useFrogEntry';
 import { useFrogOptions } from '../hooks/useFrogOptions';
 import { pairScreenshotUrls } from '../utils/attachments';
 import CombinationsTable from '../components/CombinationsTable';
+import FrogSprite from '../components/FrogSprite';
 import { formatNum } from '../utils/format';
 import { frogIdFromPath, frogPath } from '../utils/frogIds';
 
@@ -286,52 +287,63 @@ export default function Frog() {
         <p className="search-hint">{isFetching ? 'Loading…' : 'Frog not found.'}</p>
       ) : (
         <>
-          <h2 className="frog-page-name">{fullname ?? code}</h2>
+          <div className="frog-page-header">
+            <FrogSprite
+              className="frog-page-sprite"
+              baseId={linkId(frog.fields.Primary)}
+              secId={linkId(frog.fields.Secondary)}
+              breedId={linkId(frog.fields.Breed)}
+              title={fullname ?? code ?? undefined}
+            />
+            <div className="frog-page-header-info">
+              <h2 className="frog-page-name">{fullname ?? code}</h2>
 
-          <div className="breed-info-stats frog-page-stats">
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">
-                Value
-                {isMaxValue && <span className="max-value-star is-gold" title="Highest value in the database">★</span>}
-                {isBreedMax && <span className="max-value-star" title="Highest value in its breed">★</span>}
-              </span>
-              <span className="breed-info-stat-value">{formatNum(value)}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Speed</span>
-              <span className="breed-info-stat-value">{formatNum(speed)}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Stamina</span>
-              <span className="breed-info-stat-value">{formatNum(stamina)}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Speed + Stamina</span>
-              <span className="breed-info-stat-value">{formatNum(racing)}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Level</span>
-              <span className="breed-info-stat-value">{formatNum(level?.fields.Level_No)}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Hatch Time</span>
-              <span className="breed-info-stat-value">{level?.fields.Hatch ?? '—'}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Growth Time</span>
-              <span className="breed-info-stat-value">{level?.fields.Growth ?? '—'}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Flies to Tame</span>
-              <span className="breed-info-stat-value">{formatNum(level?.fields.Flies)}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Rarity</span>
-              <span className="breed-info-stat-value">{level?.fields.Rarity ?? '—'}</span>
-            </div>
-            <div className="breed-info-stat">
-              <span className="breed-info-stat-label">Release Version</span>
-              <span className="breed-info-stat-value">{breedRec?.fields.Version ?? '—'}</span>
+              <div className="breed-info-stats frog-page-stats">
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">
+                    Value
+                    {isMaxValue && <span className="max-value-star is-gold" title="Highest value in the database">★</span>}
+                    {isBreedMax && <span className="max-value-star" title="Highest value in its breed">★</span>}
+                  </span>
+                  <span className="breed-info-stat-value">{formatNum(value)}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Speed</span>
+                  <span className="breed-info-stat-value">{formatNum(speed)}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Stamina</span>
+                  <span className="breed-info-stat-value">{formatNum(stamina)}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Speed + Stamina</span>
+                  <span className="breed-info-stat-value">{formatNum(racing)}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Level</span>
+                  <span className="breed-info-stat-value">{formatNum(level?.fields.Level_No)}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Hatch Time</span>
+                  <span className="breed-info-stat-value">{level?.fields.Hatch ?? '—'}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Growth Time</span>
+                  <span className="breed-info-stat-value">{level?.fields.Growth ?? '—'}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Flies to Tame</span>
+                  <span className="breed-info-stat-value">{formatNum(level?.fields.Flies)}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Rarity</span>
+                  <span className="breed-info-stat-value">{level?.fields.Rarity ?? '—'}</span>
+                </div>
+                <div className="breed-info-stat">
+                  <span className="breed-info-stat-label">Release Version</span>
+                  <span className="breed-info-stat-value">{breedRec?.fields.Version ?? '—'}</span>
+                </div>
+              </div>
             </div>
           </div>
 

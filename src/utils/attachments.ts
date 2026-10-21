@@ -17,6 +17,12 @@ export function imageProxyUrl(table: AttachmentTable, recordId: string, field: s
   return index > 0 ? `${url}?i=${index}` : url;
 }
 
+// Picks one attachment by its exact file name, so reordering the files in
+// Teable can't swap them (e.g. a breed's sprite layers).
+export function imageProxyUrlByName(table: AttachmentTable, recordId: string, field: string, name: string): string {
+  return `${imageProxyUrl(table, recordId, field)}?name=${encodeURIComponent(name)}`;
+}
+
 // Proxy URLs for every screenshot on a Frog Pairs record.
 export function pairScreenshotUrls(pairId: string, count: number): string[] {
   return Array.from({ length: count }, (_, i) => imageProxyUrl('pairs', pairId, 'Screenshot', i));

@@ -3637,6 +3637,32 @@ a.csv-btn {
 }
 
 /* Frog page */
+.frog-page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.frog-page-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Rendered frog left of the name + stats; the canvas is 224×184 device px */
+.frog-page-sprite {
+  flex: none;
+  width: 168px;
+  height: auto;
+  margin-top: 12px;
+}
+
+@media (max-width: 640px) {
+  .frog-page-header {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
 .frog-page-name {
   font-size: 22px;
   margin: 20px 0 8px;
