@@ -128,13 +128,18 @@ const FAQ: FaqSection[] = [
     ],
   },
   {
-    id: 'general',
-    title: 'General Information',
+    id: 'credit',
+    title: 'Credit',
     items: [
       {
-        id: 'wip',
-        question: 'WIP',
-        answer: <p>This section is a work in progress.</p>,
+        id: 'rilinium',
+        question: 'rilinium',
+        answer: <p>Thank you to <a href="https://github.com/rilinium" target="_blank" rel="noopener noreferrer">rilinium</a> for granting me permission to user their <a href="https://splashdex.rilinium.com/" target="_blank" rel="noopener noreferrer">Splashdex</a> site to pull code and ideas from. In particular, the decoding and rendering of frogs based on search and scraping the NimbleBit site for the Weekly Sets.</p>,
+      },
+      {
+        id: 'KielaSandros',
+        question: 'KielaSandros',
+        answer: <p>Thank you to Pocket Frogs Discord user KielaSandros for their various published calculators. In particular, the <a href="https://docs.google.com/spreadsheets/d/1BYzcCfiLcuTSZZOqb_iI85S5p5PZiOeT1BaFWLKLMpM/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Pair Predictor</a> (and the additional contributors named there), which generated the NoMu Color Wheel and inspired my Color Wheel page and its various calculations.</p>,
       },
     ],
   },
