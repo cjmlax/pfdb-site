@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import { useDailyFrog } from '../hooks/useDailyFrog';
+import FrogSprite from '../components/FrogSprite';
 import { fetchTable, fetchMutations, fetchFrogStats, type TeableRecord } from '../api/teable';
 import { formatNum } from '../utils/format';
 import { frogPath } from '../utils/frogIds';
@@ -74,7 +75,7 @@ function SiteSummaryCard() {
   const { data: weekly } = useQuery({ queryKey: ['table', 'weekly'], queryFn: () => fetchTable('weekly') });
   const { data: mutations } = useQuery({ queryKey: ['mutations'], queryFn: fetchMutations });
 
-  // The frogs table is too large to fetch in full — two aggregation calls instead.
+  // The frogs table is too large to fetch in full — the worker serves a daily cached summary.
   const { data: frogStats } = useQuery({
     queryKey: ['frog-stats'],
     queryFn: fetchFrogStats,
@@ -209,11 +210,18 @@ function LinksCard() {
 // ── Cards ─────────────────────────────────────────────────────────────────────
 
 function DailyFrogCard() {
-  const { name, level, value, speed, stamina, isLoading } = useDailyFrog();
+  const { name, level, value, speed, stamina, baseId, secId, breedId, isLoading } = useDailyFrog();
 
   return (
     <div className="frog-card">
       <span className="daily-frog-panel-label">PFDB Frog of the Day</span>
+      <FrogSprite
+        className="daily-frog-sprite"
+        baseId={baseId}
+        secId={secId}
+        breedId={breedId}
+        title={name ?? undefined}
+      />
       <p className="daily-frog-panel-name">
         {isLoading ? 'Loading…' : (name ?? '—')}
       </p>

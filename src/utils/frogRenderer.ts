@@ -36,23 +36,28 @@ const OVERLAY_UNDER_PATTERN = new Set([115]);
 //   scroll  — the anim texture's red slides along dir (UV units per cycle),
 //             tiled scaleX × scaleY times across the pose, and is drawn as a
 //             glossy shine in the pattern color; the sprite gives only the outline.
+//             maskEdge remaps the sprite's alpha (smoothstep low → high) to drop
+//             its soft glow halo, and the result is clipped to the body sprite,
+//             so the shine stays on the frog (e.g. between the back legs).
 //   sparkle — stars in the anim texture flash white once per cycle, each at
 //             its own moment (blue ÷ red), over the normal tinted pattern.
 type AnimCfg =
-  | { type: 'scroll'; speed: number; dirX: number; dirY: number; scaleX: number; scaleY: number }
+  | { type: 'scroll'; speed: number; dirX: number; dirY: number; scaleX: number; scaleY: number;
+      maskEdge: [number, number] }
   | { type: 'sparkle'; speed: number };
 const ANIMATED: Record<number, AnimCfg> = {
-  122: { type: 'scroll', speed: 0.25, dirX: 0, dirY: 1, scaleX: 1.35, scaleY: 1.0 }, // Flagro (v-scroll)
-  123: { type: 'sparkle', speed: 0.174 },                                            // Araneum
+  122: { type: 'scroll', speed: 0.25, dirX: 0, dirY: 1, scaleX: 1.35, scaleY: 1.0, maskEdge: [0.45, 0.75] }, // Flagro
+  123: { type: 'sparkle', speed: 0.174 },                                                                     // Araneum
 };
 
 // The game's pattern clock: real seconds, wrapped every 1000s. Every current
 // speed is a whole number of cycles per 1000s, so the wrap is seamless.
 const CLOCK_WRAP = 1000;
 
-// Chroma sweeps the secondary color around the hue wheel: one cycle every ~8.3s
-// (Splashdex's 0.002/frame at 60fps), on a clock so refresh rate doesn't matter.
-const CHROMA_HUE_PER_SEC = 0.12;
+// Chroma sweeps the secondary color around the hue wheel: one cycle every ~12s,
+// measured from an in-game recording (~30°/s). It runs on the unwrapped clock,
+// since 1000s isn't a whole number of cycles.
+const CHROMA_HUE_PER_SEC = 1 / 12;
 
 const SPRITE_BASE    = `${import.meta.env.BASE_URL}sprites/frog_base_256.png`;
 const SPRITE_OVERLAY = `${import.meta.env.BASE_URL}sprites/overlay_256.png`;
@@ -178,6 +183,19 @@ export async function createFrogRenderer(canvas: HTMLCanvasElement, look: FrogLo
     }
   }
 
+  // Scroll: the pattern's coverage — halo trimmed, clipped to the body — per view pixel.
+  let scMask: Float32Array | null = null;
+  if (scroll) {
+    scMask = new Float32Array(VIEW_W * VIEW_H);
+    const [lo, hi] = scroll.maskEdge;
+    for (let y = 0, j = 0; y < VIEW_H; y++) {
+      for (let x = 0; x < VIEW_W; x++, j++) {
+        const i = ((y + VY) * 256 + x + VX) * 4;
+        scMask[j] = smoothstep(lo, hi, P[i + 3] / 255) * smoothstep(0.5, 1, B[i + 3] / 255);
+      }
+    }
+  }
+
   // Working pixel (straight alpha): color 0–255, alpha 0–1.
   let r = 0, g = 0, b = 0, a = 0;
   const over = (sr: number, sg: number, sb: number, sa: number) => {
@@ -199,7 +217,7 @@ export async function createFrogRenderer(canvas: HTMLCanvasElement, look: FrogLo
 
   const draw = (tSec: number) => {
     const t = tSec % CLOCK_WRAP;
-    const [pr, pg, pb] = look.chroma ? hsvToRgb((t * CHROMA_HUE_PER_SEC) % 1) : look.sec;
+    const [pr, pg, pb] = look.chroma ? hsvToRgb((tSec * CHROMA_HUE_PER_SEC) % 1) : look.sec;
     const cycle = cfg ? t * cfg.speed : 0;
     // Scroll offset in UV units; the texture repeats, so only the fraction matters.
     const offU = scroll ? (scroll.dirX * cycle) % 1 : 0;
@@ -219,12 +237,13 @@ export async function createFrogRenderer(canvas: HTMLCanvasElement, look: FrogLo
         if (overlayFirst) shade(i);
 
         const ma = P[i + 3] / 255;
-        if (scroll && anim) {
+        if (scroll && anim && scMask) {
           // Glossy shine from the scrolling texture; it also decides where the
           // pattern shows. The sprite contributes only its outline (alpha).
-          if (ma > 0) {
+          const cover = scMask[j >> 2];
+          if (cover > 0) {
             const s = sampleRepeat(anim, (x / 256) * scroll.scaleX + offU, vTex, 0);
-            const pa = smoothstep(0.34, 0.72, s) * ma;
+            const pa = smoothstep(0.34, 0.72, s) * cover;
             if (pa > 0) {
               const lift = 0.6 + 0.75 * s, hi = 0.35 * smoothstep(0.78, 0.98, s) * 255;
               over(Math.min(255, pr * lift + hi), Math.min(255, pg * lift + hi), Math.min(255, pb * lift + hi), pa);

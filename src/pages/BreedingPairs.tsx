@@ -363,8 +363,8 @@ export default function BreedingPairs() {
       </p>
 
       <div className="breeding-parents">
-        <FrogInputs key={`a-${urlRead}`} title="Parent Frog A" sel={pa} onChange={setPa} options={frogOptions} />
-        <FrogInputs key={`b-${urlRead}`} title="Parent Frog B" sel={pb} onChange={setPb} options={frogOptions} />
+        <FrogInputs key={`a-${urlRead}`} title="Parent Frog A" sel={pa} onChange={setPa} options={frogOptions} sprite />
+        <FrogInputs key={`b-${urlRead}`} title="Parent Frog B" sel={pb} onChange={setPb} options={frogOptions} sprite />
       </div>
 
       {!allSelected ? (

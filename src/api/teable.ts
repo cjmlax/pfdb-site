@@ -1,4 +1,5 @@
 import { get, set } from 'idb-keyval';
+import { API_BASE } from './base';
 
 const BASE_API = 'https://teable.pfdatabase.com/api';
 const BASE_URL = `${BASE_API}/table`;
@@ -370,47 +371,40 @@ export async function fetchFrogById<T extends Record<string, unknown>>(
 }
 
 // ── Frog summary stats ─────────────────────────────────────────────────────
-// The frogs table is far too large (40k+ rows) to fetch in full just to count
-// it and find the highest Value, so the home summary uses two lightweight calls:
-// a row-count aggregation, and a single record sorted by Value descending. The
-// sorted record yields both the max value and the record id to link to — and if
-// several frogs share the max, it resolves to whichever the DB orders first.
-// Value field ID: fldsFCJTusSBpi0mYH3.
-const FROG_VALUE_FIELD = 'fldsFCJTusSBpi0mYH3';
+// The frog count and highest Value (with every frog tied at it) are slow to
+// compute from the 40k+ row frogs table, so the worker computes them daily and
+// serves its cached copy — this is a single fast read.
 
 export interface FrogStats {
   count: number;
   maxValue: number | null;
   topFrogs: { id: string; frogId: string; fullname: string }[]; // every frog tied at maxValue
+  updatedAt?: string;
 }
 
-// How many top-sorted records to scan for ties at the max value. The highest
-// value is realistically held by only a handful of frogs, so this cap is never
-// approached, but it bounds the single request.
-const TOP_TIE_CAP = 50;
-
 export async function fetchFrogStats(): Promise<FrogStats> {
-  const countUrl = `${BASE_URL}/${TABLES.frogs.id}/aggregation/row-count`;
-  const orderBy  = encodeURIComponent(JSON.stringify([{ fieldId: FROG_VALUE_FIELD, order: 'desc' }]));
-  const topUrl   = `${BASE_URL}/${TABLES.frogs.id}/record?fieldKeyType=dbFieldName&take=${TOP_TIE_CAP}&orderBy=${orderBy}`;
+  const res = await fetch(`${API_BASE}/api/stats/frogs`, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`Frog stats failed: ${res.status}`);
+  return res.json() as Promise<FrogStats>;
+}
 
-  const [countRes, topRes] = await Promise.all([
-    fetch(countUrl, { headers: { Accept: 'application/json' } }),
-    fetch(topUrl,   { headers: { Accept: 'application/json' } }),
-  ]);
-  if (!countRes.ok) throw new Error(`Frog count failed: ${countRes.status}`);
-  if (!topRes.ok)   throw new Error(`Frog top-value fetch failed: ${topRes.status}`);
+// ── Frog of the Day ────────────────────────────────────────────────────────
+// Picked from the date by the worker and cached there for every visitor.
 
-  const countData = (await countRes.json()) as { rowCount?: number };
-  const topData   = (await topRes.json()) as {
-    records?: { id: string; name?: string; fields: { Value?: number; fullname?: string; Frog_ID?: string } }[];
-  };
+export interface DailyFrog {
+  date:    string; // the date actually served (the worker's UTC today if the asked date is out of range)
+  name:    string;
+  baseId:  string;
+  secId:   string;
+  breedId: string;
+  level:   number | null;
+  frog: { id: string; frogId: string; value: number | null; speed: number | null; stamina: number | null } | null;
+}
 
-  const records  = topData.records ?? [];
-  const maxValue = typeof records[0]?.fields.Value === 'number' ? records[0].fields.Value : null;
-  const topFrogs = maxValue == null ? [] : records
-    .filter(r => r.fields.Value === maxValue)
-    .map(r => ({ id: r.id, frogId: String(r.fields.Frog_ID ?? r.name ?? ''), fullname: String(r.fields.fullname ?? r.name ?? '') }));
-
-  return { count: countData.rowCount ?? 0, maxValue, topFrogs };
+export async function fetchDailyFrog(date: string): Promise<DailyFrog> {
+  const res = await fetch(`${API_BASE}/api/stats/daily-frog?date=${encodeURIComponent(date)}`, {
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error(`Frog of the Day failed: ${res.status}`);
+  return res.json() as Promise<DailyFrog>;
 }

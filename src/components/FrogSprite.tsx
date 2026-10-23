@@ -41,7 +41,10 @@ const reducedMotion = () =>
 // for breeds without them.
 export default function FrogSprite({
   baseId, secId, breedId, className, title,
-}: { baseId: string | null; secId: string | null; breedId: string | null; className?: string; title?: string }) {
+}: {
+  baseId: string | null; secId: string | null; breedId: string | null;
+  className?: string; title?: string;
+}) {
   const { data: breeds } = useQuery({ queryKey: ['table', 'breeds'], queryFn: () => fetchTable<BreedFields>('breeds') });
   const { data: bases  } = useQuery({ queryKey: ['table', 'bases'],  queryFn: () => fetchTable<BaseFields>('bases')  });
   const { data: secs   } = useQuery({ queryKey: ['table', 'secs'],   queryFn: () => fetchTable<SecFields>('secs')    });

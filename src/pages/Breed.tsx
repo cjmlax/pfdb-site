@@ -5,8 +5,9 @@ import { type SortingState } from '@tanstack/react-table';
 import { fetchTable, fetchBreedFrogs, fetchMutations, fetchFrogById } from '../api/teable';
 import ComboBox, { type ComboOption } from '../components/ComboBox';
 import WeeklyTable, { type WeeklyFields, WEEKLY_FROG_FIELDS } from '../components/WeeklyTable';
-import { hasAttachment, imageProxyUrl, pairScreenshotUrls } from '../utils/attachments';
+import { pairScreenshotUrls } from '../utils/attachments';
 import CombinationsTable from '../components/CombinationsTable';
+import FrogSprite from '../components/FrogSprite';
 import { formatNum } from '../utils/format';
 import { downloadCsv } from '../utils/csv';
 import { breedOptionsFrom } from '../utils/breeds';
@@ -20,7 +21,6 @@ interface BreedFields extends Record<string, unknown> {
   Level?:        unknown;   // link → { id, title } where title is the level number
   Version?:      string;
   Promotional?:  boolean;
-  Stock_Image?:  unknown;  // attachment field
 }
 interface BaseFields  extends Record<string, unknown> { BaseColors?: string }
 interface SecFields   extends Record<string, unknown> { Sec_Color?:  string }
@@ -187,9 +187,21 @@ export default function Breed() {
     if (!rec) return null;
     const levelId = linkId(rec.fields.Level);
     const level = levels?.find(l => l.id === levelId) ?? null;
-    const image = hasAttachment(rec.fields.Stock_Image) ? imageProxyUrl('breeds', rec.id, 'Stock_Image') : null;
-    return { rec, level, image };
+    return { rec, level };
   }, [breed, breeds, levels]);
+
+  // The info box shows the breed rendered in a random base + secondary color.
+  // One roll per visit, mixed with the breed id, so each breed gets its own
+  // colors and they hold steady while it's shown.
+  const [roll] = useState(() => Math.random());
+  const spriteColors = useMemo(() => {
+    if (!breed || !bases?.length || !secs?.length) return null;
+    let h = 0;
+    for (const c of breed.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    const r1 = (roll + h * 0.6180339887) % 1;
+    const r2 = (roll * 7.31 + h * 0.4142135623) % 1;
+    return { baseId: bases[Math.floor(r1 * bases.length)].id, secId: secs[Math.floor(r2 * secs.length)].id };
+  }, [breed, bases, secs, roll]);
 
   const { data: frogs, isFetching, error } = useQuery({
     queryKey: ['breed-frogs', breed?.id],
@@ -422,11 +434,13 @@ export default function Breed() {
 
       {breedInfo && (
         <div className="breed-info">
-          {breedInfo.image && (
-            <img
-              className="breed-info-image"
-              src={breedInfo.image}
-              alt={`${breed?.label ?? 'Breed'} stock art`}
+          {spriteColors && (
+            <FrogSprite
+              className="breed-info-sprite"
+              baseId={spriteColors.baseId}
+              secId={spriteColors.secId}
+              breedId={breedInfo.rec.id}
+              title={breed?.label}
             />
           )}
           <div className="breed-info-stats">

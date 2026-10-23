@@ -7,10 +7,6 @@ import { API_BASE } from '../api/base';
 // re-resolves a fresh presignedUrl on every hit (see its /api/image route).
 export type AttachmentTable = 'breeds' | 'pairs';
 
-export function hasAttachment(val: unknown): boolean {
-  return Array.isArray(val) && val.length > 0;
-}
-
 // index picks one of several attachments in the field (the first by default).
 export function imageProxyUrl(table: AttachmentTable, recordId: string, field: string, index = 0): string {
   const url = `${API_BASE}/api/image/${table}/${encodeURIComponent(recordId)}/${encodeURIComponent(field)}`;

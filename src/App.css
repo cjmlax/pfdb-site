@@ -629,6 +629,13 @@ a.plain-link:hover {
   color: var(--accent);
 }
 
+/* Rendered frog above the Frog of the Day name; the canvas is 224×184 device px */
+.daily-frog-sprite {
+  align-self: center;
+  width: 140px;
+  height: auto;
+}
+
 .daily-frog-panel-name {
   font-size: 16px;
   font-weight: 500;
@@ -800,6 +807,7 @@ a.plain-link:hover {
 }
 
 .parent-group {
+  position: relative; /* anchors .parent-sprite */
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -807,6 +815,17 @@ a.plain-link:hover {
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 16px 18px;
+}
+
+/* Rendered parent frog in the box's top-right corner, over the empty space
+   beside the title and first field label — ends above the first input box. */
+.parent-sprite {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  height: 64px;
+  width: auto;
+  pointer-events: none;
 }
 
 .parent-title {
@@ -2815,7 +2834,7 @@ main {
 
 /* Breed info box above the grid */
 .breed-info {
-  display: flow-root; /* contain the floated stock image */
+  display: flow-root; /* contain the floated frog sprite */
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--code-bg);
@@ -2823,14 +2842,12 @@ main {
   margin-bottom: 20px;
 }
 
-.breed-info-image {
+/* Rendered breed in random colors, floated left of the stats */
+.breed-info-sprite {
   float: left;
   height: 57px;       /* match the height of one label + value stat */
   width: auto;
-  object-fit: contain;
   margin: 0 16px 0 0;
-  border-radius: 6px;
-  background: var(--bg);
 }
 
 .breed-info-stats {
